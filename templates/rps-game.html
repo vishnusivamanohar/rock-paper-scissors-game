@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+      margin:0;
+    }
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 30px;
+      background: linear-gradient(to right, #00ffcc, #006666);
+      box-shadow: 0 2px 10px rgba(0, 255, 204, 0.3);
+      border-radius: 10px;
+      margin-bottom: 30px;
+      margin-top:0px;
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #121212;
+      text-shadow: 0 0 2px white;
+    }
+
+    .a {
+      text-decoration: none;
+      background: #121212;
+      padding: 10px 20px;
+      color: #00ffcc;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.3s ease;
+      border: 1px solid #00ffaa;
+    }
+
+    .a:hover {
+      background: #00ffaa;
+      color: #121212;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+
+    .container {
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 30px;
+      width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #00ffcc;
+      color: #000;
+      transition: 0.2s ease;
+    }
+    button:hover {
+      background-color: #00ffaa;
+    }
+    .result, .score {
+      margin-top: 20px;
+    }
+    .reset-btn {
+      background: red;
+      color: white;
+      margin-top: 20px;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      margin: 5px;
+      margin-left:140px;
+    }
+    .name-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .name-score-row input {
+      flex: 1;
+      min-width: 180px;
+      margin: 0;
+    }
+
+    #total_atempts {
+      background: orange;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 5px;
+      font-size: 20px;
+      min-width: 50px;
+      text-align: center;
+    }
+    .music-control {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: #00ffcc;
+      color: #121212;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 25px;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .music-control span {
+      display: inline-block;
+      line-height: 1;
+      margin-top: -2px; /* Small adjustment for perfect centering */
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgMusic" loop>
+    <source src="{{ url_for('static', filename='bg-music(plsent).mp3') }}" type="audio/mpeg">
+  </audio>
+  <button class="music-control" id="musicToggle"><span>🔊</span></button>
+  
+  <div class="navbar">
+    <div class="logo">🌟 Single-Player RPS-Game(-> <a href="{{ url_for('double_player') }}">Double player</a>)</div>
+    <button class="a" type="button" onclick="location.href='/scores'">SCORES</button>
+  </div>
+  
+  <form method="POST" action="/submit">
+    <div class="container">
+      <div class="name-score-row">
+        <input type="text" name="player_name" placeholder="Enter your name" required>
+        <span id="total_atempts">0</span>
+      </div>
+
+      <h1>🌑 Rock 📄 Paper ✂️ Scissors</h1>
+      <div class="buttons">
+        <button type="button" onclick="play('rock')">🌑 Rock</button>
+        <button type="button" onclick="play('paper')">📄 Paper</button>
+        <button type="button" onclick="play('scissors')">✂️ Scissors</button>
+      </div>
+      <div class="result">
+        <p><strong>You:</strong> <span id="player">-</span></p>
+        <p><strong>Computer:</strong> <span id="computer">-</span></p>
+        <p><strong>Result:</strong> <span id="outcome">-</span></p>
+      </div>
+      <div class="score">
+        <p>
+          ✅ Wins: <span id="win">0</span>
+          ❌ Losses: <span id="lose">0</span>
+          ➖ Draws: <span id="draw">0</span>
+        </p>
+      </div>
+
+      <!-- Hidden input fields to send scores to Flask -->
+      <input type="hidden" name="wins" id="win_input" value="0">
+      <input type="hidden" name="losses" id="lose_input" value="0">
+      <input type="hidden" name="draws" id="draw_input" value="0">
+
+      <button type="submit" class="reset-btn">🔄 Submit & Reset</button>
+    </div>
+  </form>
+  
+  <script>
+    const options = ['rock', 'paper', 'scissors'];
+    let score = { win: 0, lose: 0, draw: 0 };
+    total_atempts=0;
+    
+    function play(player) {
+      const computer = options[Math.floor(Math.random() * 3)];
+      let result = '';
+
+      if (player === computer) {
+        result = 'draw';
+      } else if (
+        (player === 'rock' && computer === 'scissors') ||
+        (player === 'scissors' && computer === 'paper') ||
+        (player === 'paper' && computer === 'rock')
+      ) {
+        result = 'win';
+      } else {
+        result = 'lose';
+      }
+
+      score[result]++;
+      updateUI(player, computer, result);
+    }
+
+    function updateUI(player, computer, result) {
+      total_atempts++;
+      document.getElementById('player').textContent = player;
+      document.getElementById('computer').textContent = computer;
+      document.getElementById('outcome').textContent = result.toUpperCase();
+
+      document.getElementById('win').textContent = score.win;
+      document.getElementById('lose').textContent = score.lose;
+      document.getElementById('draw').textContent = score.draw;
+      document.getElementById('total_atempts').textContent = total_atempts;
+      
+      // Update hidden inputs
+      document.getElementById('win_input').value = score.win;
+      document.getElementById('lose_input').value = score.lose;
+      document.getElementById('draw_input').value = score.draw;
+    }
+  </script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const music = document.getElementById('bgMusic');
+      const toggleBtn = document.getElementById('musicToggle');
+      
+      // Check localStorage for previous state
+      const savedState = localStorage.getItem('musicPlaying');
+      
+      // Try to autoplay if previously playing (may still be blocked by browser)
+      if (savedState === 'true') {
+        music.play().catch(e => {
+          console.log("Autoplay blocked:", e);
+          toggleBtn.innerHTML = '<span>🔇</span>';
+        });
+      }
+      
+      // Toggle button functionality
+      toggleBtn.addEventListener('click', function() {
+        if (music.paused) {
+          music.play()
+            .then(() => {
+              toggleBtn.innerHTML = '<span>🔊</span>';
+              localStorage.setItem('musicPlaying', 'true');
+            })
+            .catch(e => {
+              console.log("Playback failed:", e);
+              toggleBtn.innerHTML = '<span>🔇</span>';
+            });
+        } else {
+          music.pause();
+          toggleBtn.innerHTML = '<span>🔇</span>';
+          localStorage.setItem('musicPlaying', 'false');
+        }
+      });
+      
+      // Update button state based on current playback
+      music.addEventListener('play', () => {
+        toggleBtn.innerHTML = '<span>🔊</span>';
+      });
+      
+      music.addEventListener('pause', () => {
+        toggleBtn.innerHTML = '<span>🔇</span>';
+      });
+      
+      // Initial button state
+      toggleBtn.innerHTML = music.paused ? '<span>🔇</span>' : '<span>🔊</span>';
+    });
+  </script>
+</body>
+</html>

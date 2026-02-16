@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>scores</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: linear-gradient(to right, #00ffcc, #006666);
+      box-shadow: 0 2px 10px rgba(0, 255, 204, 0.3);
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #121212;
+      text-shadow: 0 0 2px white;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      background: #121212;
+      padding: 10px 20px;
+      color: #00ffcc;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.3s ease;
+      border: 1px solid #00ffaa;
+    }
+
+    .navbar a:hover {
+      background: #00ffaa;
+      color: #121212;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+
+    table {
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #1f1f1f;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+
+    th, td {
+      padding: 15px;
+      border-bottom: 1px solid #333;
+    }
+
+    th {
+      background: #00ffcc;
+      color: #000;
+    }
+
+    td {
+      color: #fff;
+    }
+
+    tr:hover {
+      background: #2a2a2a;
+    }
+    
+    .music-control {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: #00ffcc;
+      color: #121212;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 25px;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgMusic" loop>
+    <source src="{{ url_for('static', filename='bg-music(plsent).mp3') }}" type="audio/mpeg">
+  </audio>
+  
+  <button class="music-control" id="musicToggle">🔊</button>
+
+  <div class="navbar">
+    <div class="logo">🏆 Game High Scores</div>
+    <a href="/">🎮 Play Again</a>
+  </div>
+
+  <h1 style="margin:10px">Top Players</h1>
+  <table>
+    <tr>
+      <th>Rank</th>
+      <th>Name</th>
+      <th>Total Attempts</th>
+      <th>Score</th>
+      <th>Wins</th>
+      <th>Losses</th>
+      <th>Draws</th>
+    </tr>
+    {% for row in scores %}
+    <tr>
+      <td>{{ loop.index }}</td> 
+      <td>{{ row.player_name }}</td>
+      <td>{{ row.total_atempts }}</td>
+      <td>{{ row.score }}</td>
+      <td>{{ row.wins }}</td>
+      <td>{{ row.losses }}</td>
+      <td>{{ row.draws }}</td>
+    </tr>
+    {% set i = 1 %}
+    {% endfor %}
+  </table>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const music = document.getElementById('bgMusic');
+      const toggleBtn = document.getElementById('musicToggle');
+      
+      // Check localStorage for previous state
+      const savedState = localStorage.getItem('musicPlaying');
+      
+      // Try to autoplay if previously playing (may still be blocked by browser)
+      if (savedState === 'true') {
+        music.play().catch(e => {
+          console.log("Autoplay blocked:", e);
+          toggleBtn.textContent = '🔇';
+        });
+      }
+      
+      // Toggle button functionality
+      toggleBtn.addEventListener('click', function() {
+        if (music.paused) {
+          music.play()
+            .then(() => {
+              toggleBtn.textContent = '🔊';
+              localStorage.setItem('musicPlaying', 'true');
+            })
+            .catch(e => {
+              console.log("Playback failed:", e);
+              toggleBtn.textContent = '🔇';
+            });
+        } else {
+          music.pause();
+          toggleBtn.textContent = '🔇';
+          localStorage.setItem('musicPlaying', 'false');
+        }
+      });
+      
+      // Update button state based on current playback
+      music.addEventListener('play', () => {
+        toggleBtn.textContent = '🔊';
+      });
+      
+      music.addEventListener('pause', () => {
+        toggleBtn.textContent = '🔇';
+      });
+      
+      // Initial button state
+      toggleBtn.textContent = music.paused ? '🔇' : '🔊';
+    });
+  </script>
+</body>
+</html>

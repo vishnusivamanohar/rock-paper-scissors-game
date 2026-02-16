@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Two-Player Scores</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #121212; color: white; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: linear-gradient(to right, #00ffcc, #006666); box-shadow: 0 2px 10px rgba(0, 255, 204, 0.3); border-radius: 10px; margin-bottom: 30px; }
+        .navbar .logo { font-size: 22px; font-weight: bold; color: #121212; text-shadow: 0 0 2px white; }
+        .navbar a { text-decoration: none; background: #121212; padding: 10px 20px; color: #00ffcc; border-radius: 8px; font-weight: bold; transition: 0.3s ease; border: 1px solid #00ffaa; }
+        .navbar a:hover { background: #00ffaa; color: #121212; box-shadow: 0 0 10px #00ffaa; }
+        table { width: 90%; max-width: 1200px; margin: 0 auto; border-collapse: collapse; background: #1f1f1f; border-radius: 10px; overflow: hidden; box-shadow: 0 0 15px #00ffcc; }
+        th, td { padding: 15px; border-bottom: 1px solid #333; }
+        th { background: #00ffcc; color: #000; }
+        td { color: #fff; }
+        tr:hover { background: #2a2a2a; }
+        .winner { font-weight: bold; color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">🏆 Two-Player Game Leaderboard</div>
+        <a href="{{ url_for('double_player') }}">🎮 Play Again</a>
+    </div>
+
+    <h1 style="margin-bottom:15px;">Top Game Sessions</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Total Attempts</th>
+                <th>Winner</th>
+                <th>P1 Wins</th>
+                <th>P2 Wins</th>
+                <th>Winner's Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ session.player1_name }}</td>
+                <td>{{ session.player2_name }}</td>
+                <td>{{ session.total_attempts }}</td>
+                <td class="winner">{{ session.winner_name }}</td>
+                <td>{{ session.player1_wins }}</td>
+                <td>{{ session.player2_wins }}</td>
+                <td>{{ session.winner_score }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8">No games have been played yet. Be the first!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
