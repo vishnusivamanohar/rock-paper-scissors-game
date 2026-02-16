@@ -12,7 +12,7 @@ Persistent Scoring: Unlike basic versions, this uses a database to track Wins, L
 
 Interactive UI: A dark-themed, responsive interface designed for both desktop and mobile play.
 
-Detailed Documentation: For a full walkthrough of the features and screenshots, visit the About Page( https://vishnusivamanohar.github.io/rock-paper-scissors-game/static/aboutme.html).
+Detailed Documentation: For a full walkthrough of the features and screenshots, visit the About Page( https://vishnusivamanohar.github.io/rock-paper-scissors-game/static/about.html).
 
 🛠️ Technical Stack
 Frontend: HTML5, CSS3 (Modern Dark Theme), and JavaScript for real-time game logic.
