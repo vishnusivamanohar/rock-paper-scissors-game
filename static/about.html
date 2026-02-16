@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #0f0f0f;
+            color: #e0e0e0;
+        }
+        header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 15px 50px; 
+            background-color: #1a1a1a;
+            border-bottom: 2px solid #00ffcc;
+        }
+        .title-box {
+            color: #00ffcc;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .profile-btn {
+            background-color: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .profile-btn:hover {
+            background-color: #00ccaa;
+            transform: scale(1.05);
+        }
+        section {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h2, h3 {
+            padding: 12px;
+            background-color: #333;
+            color: #00ffcc;
+            border-left: 5px solid #00ffcc;
+            border-radius: 4px;
+        }
+        p {
+            padding: 10px;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #444;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        }
+        .tech-stack {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .badge {
+            background: #333;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #888;
+            margin-top: 40px;
+        }
+        a { text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="title-box">Rock Paper Scissors AI</div>
+        <a href="#"><button class="profile-btn">View My Profile</button></a>
+    </header>
+
+    <section>
+        <h2>Project Overview</h2>
+        <p>
+            Experience the classic game of <strong>Rock Paper Scissors</strong> brought to life in a modern web environment. 
+            This project combines clean UI design with smooth logic to provide a fun, interactive gaming experience against an AI opponent.
+        </p>
+    </section>
+
+    <section>
+        <h3>1. Game Interface</h3>
+        <div class="image-container">
+            <img src="game_page.png" alt="Game Interface">
+        </div>
+        <p>
+            The game features an intuitive dashboard where players can make their move with a single click. 
+            It includes real-time result calculations and an interactive score tracker to monitor your performance throughout the session.
+			You can swatch to double player mode also.
+        </p>
+    </section>
+
+    <section>
+        <h3>2. Double Player Mode</h3>
+        <div class="image-container">
+            <img src="double_player_page.png" alt="Double Player Mode">
+        </div>
+        <p>
+            Challenge a friend locally! The Double Player mode allows two users to compete on the same device. 
+            The scores for each player are tracked individually in a competitive "Leaderboard" style format.
+        </p>
+        <div class="image-container">
+            <img src="double_player_scores.png" alt="Double Player Scores">
+        </div>
+    </section>
+
+    <section>
+        <h3>3. Scoring System</h3>
+        <div class="image-container">
+            <img src="score -page.png" alt="Global Scores">
+        </div>
+        <p>
+            The scoring system is persistent and provides a clear breakdown of Wins, Losses, and Draws. 
+            It uses dynamic updates so you never have to refresh the page to see who is leading the game.
+        </p>
+    </section>
+
+    <section>
+        <h2>Technical Architecture</h2>
+        <p>
+            This application is built with a focus on responsiveness and logic-driven gameplay.
+        </p>
+        <div class="tech-stack">
+            <span class="badge">Python (Flask)</span>
+            <span class="badge">HTML5 & CSS3</span>
+            <span class="badge">JavaScript</span>
+            <span class="badge">MySQL Database</span>
+        </div>
+        <p>
+            <strong>How It Works:</strong><br>
+            The frontend captures player moves and sends them to the <strong>Flask</strong> backend. 
+            The backend logic determines the winner based on the move hierarchy and updates the <strong>MySQL</strong> database 
+            to ensure that scores are saved and retrieved accurately for the leaderboard.
+        </p>
+    </section>
+
+    <footer>
+        Rock Paper Scissors Web | Created by Thotapalli Vishnu Siva Manohar | 2025
+    </footer>
+
+</body>
+</html>
