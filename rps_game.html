@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rock Paper Scissors</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    
+    .view-container {
+      padding: 40px;
+    }
+
+    /* Views */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* Shared Navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: linear-gradient(to right, #00ffcc, #006666);
+      box-shadow: 0 2px 10px rgba(0, 255, 204, 0.3);
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+    .navbar .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #121212;
+      text-shadow: 0 0 2px white;
+    }
+    .navbar .logo a {
+      color: #121212;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .nav-btn {
+      text-decoration: none;
+      background: #121212;
+      padding: 10px 20px;
+      color: #00ffcc;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: 0.3s ease;
+      border: 1px solid #00ffaa;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .nav-btn:hover {
+      background: #00ffaa;
+      color: #121212;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+
+    /* Music Control */
+    .music-control {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background: #00ffcc;
+      color: #121212;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 25px;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .music-control span {
+      display: inline-block;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    /* Single Player Specific */
+    .sp-container {
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 30px;
+      width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    .sp-container button.action-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #00ffcc;
+      color: #000;
+      transition: 0.2s ease;
+    }
+    .sp-container button.action-btn:hover {
+      background-color: #00ffaa;
+    }
+    .sp-container .reset-btn {
+      background: red !important;
+      color: white !important;
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .sp-container input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    .name-score-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .name-score-row input {
+      flex: 1;
+      min-width: 180px;
+      margin: 0;
+    }
+    #sp-total_atempts {
+      background: orange;
+      padding: 10px 15px;
+      color: white;
+      border-radius: 5px;
+      font-size: 20px;
+      min-width: 50px;
+      text-align: center;
+    }
+    .sp-result, .sp-score { margin-top: 20px; }
+
+    /* Double Player Specific */
+    .dp-board {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 20px;
+      gap: 20px;
+      box-shadow: 0 0 15px #00ffcc;
+      max-width: 1300px;
+      margin: auto;
+    }
+    .dp-panel, .dp-result-panel {
+      flex: 1;
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 450px;
+    }
+    .dp-panel { background: #2a2a2a; }
+    .dp-result-panel { flex: 1.2; background: #1a1a1a; }
+    .dp-panel h2, .dp-result-panel h2 { margin-top: 0; color: #00ffcc; }
+    .dp-panel input[type=text] {
+      width: 80%;
+      padding: 10px;
+      border: 1px solid #00ffcc;
+      border-radius: 5px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      background: #333;
+      color: #fff;
+    }
+    .dp-board button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #00ffcc;
+      color: #000;
+      transition: 0.2s ease;
+      width: 90%;
+    }
+    .dp-board button:hover:not(:disabled) {
+      background-color: #00ffaa;
+      transform: translateY(-2px);
+    }
+    .dp-board button:disabled {
+      background-color: #555;
+      color: #aaa;
+      cursor: not-allowed;
+    }
+    #dp-round-outcome {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #ffc107;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dp-submit-btn { background: #e91e63 !important; color: #fff !important; margin-top: 20px; width: auto !important; }
+    .choice-btn.selected { box-shadow: 0 0 15px 5px #ffc107; transform: scale(1.05); }
+    .ready-btn { background-color: #4CAF50 !important; color: white !important; }
+    .ready-btn.waiting { background-color: #ff9800 !important; }
+    .dp-controls-info { 
+      color: #00ffcc; 
+      font-size: 18px; 
+      padding: 15px; 
+      text-align: center; 
+      background: #1a1a1a; 
+      border-radius: 8px; 
+      margin: 0 auto 20px auto; 
+      box-shadow: 0 0 10px rgba(0,255,204,0.2);
+      max-width: 1300px;
+    }
+
+    /* Scores Tables */
+    table {
+      width: 80%;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #1f1f1f;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+    th, td { padding: 15px; border-bottom: 1px solid #333; }
+    th { background: #00ffcc; color: #000; }
+    td { color: #fff; }
+    tr:hover { background: #2a2a2a; }
+    .winner { font-weight: bold; color: #ffc107; }
+  </style>
+</head>
+<body>
+  <audio id="bgMusic" loop>
+    <source src="static/bg-music(plsent).mp3" type="audio/mpeg">
+  </audio>
+  <button class="music-control" id="musicToggle"><span>🔊</span></button>
+
+  <div class="view-container">
+
+    <!-- SINGLE PLAYER VIEW -->
+    <div id="view-sp" class="view">
+      <div class="navbar">
+        <div class="logo">🌟 Single-Player RPS-Game(-> <a onclick="showView('view-dp')">Double player</a>)</div>
+        <button class="nav-btn" type="button" onclick="showView('view-sp-scores')">SCORES</button>
+      </div>
+      <div class="sp-container">
+        <div class="name-score-row">
+          <input type="text" id="sp-player-name" placeholder="Enter your name" required>
+          <span id="sp-total_atempts">0</span>
+        </div>
+        <h1>🌑 Rock 📄 Paper ✂️ Scissors</h1>
+        <div class="buttons">
+          <button type="button" class="action-btn" onclick="playSP('rock')">🌑 Rock</button>
+          <button type="button" class="action-btn" onclick="playSP('paper')">📄 Paper</button>
+          <button type="button" class="action-btn" onclick="playSP('scissors')">✂️ Scissors</button>
+        </div>
+        <div class="sp-result">
+          <p><strong>You:</strong> <span id="sp-player">-</span></p>
+          <p><strong>Computer:</strong> <span id="sp-computer">-</span></p>
+          <p><strong>Result:</strong> <span id="sp-outcome">-</span></p>
+        </div>
+        <div class="sp-score">
+          <p>
+            ✅ Wins: <span id="sp-win">0</span>
+            ❌ Losses: <span id="sp-lose">0</span>
+            ➖ Draws: <span id="sp-draw">0</span>
+          </p>
+        </div>
+        <button type="button" class="reset-btn" onclick="submitSinglePlayer()">🔄 Submit & Reset</button>
+      </div>
+    </div>
+
+    <!-- SINGLE PLAYER SCORES -->
+    <div id="view-sp-scores" class="view">
+      <div class="navbar">
+        <div class="logo">🏆 Game High Scores</div>
+        <button class="nav-btn" onclick="showView('view-sp')">🎮 Play Again</button>
+      </div>
+      <h1 style="margin:10px; margin-bottom: 20px;">Top Players</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Total Attempts</th>
+            <th>Score</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Draws</th>
+          </tr>
+        </thead>
+        <tbody id="sp-scores-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- DOUBLE PLAYER VIEW -->
+    <div id="view-dp" class="view">
+      <div class="navbar">
+        <div class="logo">🌟 Two-Player RPS (<a onclick="showView('view-sp')">Single Player</a>)</div>
+        <button class="nav-btn" onclick="showView('view-dp-scores')">LEADERBOARD</button>
+      </div>
+      <div class="dp-controls-info">Player 1 Controls: <strong>A</strong> (Rock), <strong>S</strong> (Paper), <strong>D</strong> (Scissors) &nbsp;&nbsp;|&nbsp;&nbsp; Player 2 Controls: <strong>J</strong> (Rock), <strong>K</strong> (Paper), <strong>L</strong> (Scissors) &nbsp;&nbsp;|&nbsp;&nbsp; Press <strong>ENTER</strong> to start the round!</div>
+      <div class="dp-board">
+        <div class="dp-panel" id="player1-panel">
+            <input type="text" id="player1_name_input" placeholder="Enter Player 1 Name" required>
+            <h2 id="p1-title">Player 1</h2>
+            <button type="button" class="ready-btn" id="p1-ready-btn" onclick="playerReady('p1')">Ready</button>
+            <div class="player-controls" id="p1-controls" style="margin-top: 15px;">
+                <button type="button" class="choice-btn" onclick="makeChoice('p1', 'rock')" disabled>🌑 Rock</button>
+                <button type="button" class="choice-btn" onclick="makeChoice('p1', 'paper')" disabled>📄 Paper</button>
+                <button type="button" class="choice-btn" onclick="makeChoice('p1', 'scissors')" disabled>✂️ Scissors</button>
+            </div>
+        </div>
+
+        <div class="dp-result-panel">
+            <h2>Game Result</h2>
+            <div class="result-display">
+                <p id="dp-round-outcome">Click 'Ready' or Press Enter to start!</p>
+            </div>
+            <div class="score-display">
+                <h3 style="margin-top:20px;">Scores</h3>
+                <p><span id="p1-score-name">Player 1</span> Wins: <span id="dp-p1-wins">0</span></p>
+                <p><span id="p2-score-name">Player 2</span> Wins: <span id="dp-p2-wins">0</span></p>
+                <p>Draws: <span id="dp-draws">0</span></p>
+                <p>Total Attempts: <span id="dp-total_atempts">0</span></p>
+            </div>
+             <button type="button" class="dp-submit-btn" onclick="submitDoublePlayer()">🔄 Submit Scores & Reset Game</button>
+        </div>
+
+        <div class="dp-panel" id="player2-panel">
+            <input type="text" id="player2_name_input" placeholder="Enter Player 2 Name" required>
+            <h2 id="p2-title">Player 2</h2>
+            <button type="button" class="ready-btn" id="p2-ready-btn" onclick="playerReady('p2')">Ready</button>
+            <div class="player-controls" id="p2-controls" style="margin-top: 15px;">
+                <button type="button" class="choice-btn" onclick="makeChoice('p2', 'rock')" disabled>🌑 Rock</button>
+                <button type="button" class="choice-btn" onclick="makeChoice('p2', 'paper')" disabled>📄 Paper</button>
+                <button type="button" class="choice-btn" onclick="makeChoice('p2', 'scissors')" disabled>✂️ Scissors</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOUBLE PLAYER SCORES -->
+    <div id="view-dp-scores" class="view">
+      <div class="navbar">
+        <div class="logo">🏆 Two-Player Game Leaderboard</div>
+        <button class="nav-btn" onclick="showView('view-dp')">🎮 Play Again</button>
+      </div>
+      <h1 style="margin-bottom:20px;">Top Game Sessions</h1>
+      <table>
+          <thead>
+              <tr>
+                  <th>Rank</th>
+                  <th>Player 1</th>
+                  <th>Player 2</th>
+                  <th>Total Attempts</th>
+                  <th>Winner</th>
+                  <th>P1 Wins</th>
+                  <th>P2 Wins</th>
+                  <th>Winner's Score</th>
+              </tr>
+          </thead>
+          <tbody id="dp-scores-tbody">
+              <!-- Populated by JS -->
+          </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    // VIEW MANAGEMENT
+    function showView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      
+      if (viewId === 'view-sp-scores') {
+        renderSinglePlayerScores();
+      } else if (viewId === 'view-dp-scores') {
+        renderDoublePlayerScores();
+      }
+    }
+
+    // --- AUDIO LOGIC ---
+    document.addEventListener('DOMContentLoaded', function() {
+      const music = document.getElementById('bgMusic');
+      const toggleBtn = document.getElementById('musicToggle');
+      const savedState = localStorage.getItem('musicPlaying');
+      
+      if (savedState === 'true') {
+        music.play().catch(e => {
+          console.log("Autoplay blocked:", e);
+          toggleBtn.innerHTML = '<span>🔇</span>';
+        });
+      }
+      
+      toggleBtn.addEventListener('click', function() {
+        if (music.paused) {
+          music.play()
+            .then(() => {
+              toggleBtn.innerHTML = '<span>🔊</span>';
+              localStorage.setItem('musicPlaying', 'true');
+            })
+            .catch(e => {
+              console.log("Playback failed:", e);
+              toggleBtn.innerHTML = '<span>🔇</span>';
+            });
+        } else {
+          music.pause();
+          toggleBtn.innerHTML = '<span>🔇</span>';
+          localStorage.setItem('musicPlaying', 'false');
+        }
+      });
+      
+      music.addEventListener('play', () => { toggleBtn.innerHTML = '<span>🔊</span>'; });
+      music.addEventListener('pause', () => { toggleBtn.innerHTML = '<span>🔇</span>'; });
+      toggleBtn.innerHTML = music.paused ? '<span>🔇</span>' : '<span>🔊</span>';
+
+      showView('view-sp'); // Start at Single Player by default
+    });
+
+    // --- SINGLE PLAYER LOGIC ---
+    let spScore = { win: 0, lose: 0, draw: 0 };
+    let spTotalAtempts = 0;
+    
+    function playSP(player) {
+      const options = ['rock', 'paper', 'scissors'];
+      const computer = options[Math.floor(Math.random() * 3)];
+      let result = '';
+
+      if (player === computer) {
+        result = 'draw';
+      } else if (
+        (player === 'rock' && computer === 'scissors') ||
+        (player === 'scissors' && computer === 'paper') ||
+        (player === 'paper' && computer === 'rock')
+      ) {
+        result = 'win';
+      } else {
+        result = 'lose';
+      }
+
+      spScore[result]++;
+      spTotalAtempts++;
+      
+      document.getElementById('sp-player').textContent = player;
+      document.getElementById('sp-computer').textContent = computer;
+      document.getElementById('sp-outcome').textContent = result.toUpperCase();
+
+      document.getElementById('sp-win').textContent = spScore.win;
+      document.getElementById('sp-lose').textContent = spScore.lose;
+      document.getElementById('sp-draw').textContent = spScore.draw;
+      document.getElementById('sp-total_atempts').textContent = spTotalAtempts;
+    }
+
+    function submitSinglePlayer() {
+      const name = document.getElementById('sp-player-name').value.trim();
+      if (!name) { alert("Please enter your name."); return; }
+      
+      if (spScore.win > 0 && spTotalAtempts > 0) {
+        let denominator = spTotalAtempts - (spScore.draw / 2);
+        let scoreVal = denominator !== 0 ? (spScore.win / denominator) * 100 : 0;
+        
+        let scores = JSON.parse(localStorage.getItem('rps_single_scores') || '[]');
+        
+        let existingIndex = scores.findIndex(s => s.player_name === name);
+        if (existingIndex !== -1) {
+           if (scoreVal >= scores[existingIndex].score) {
+              scores[existingIndex] = {
+                 player_name: name,
+                 score: scoreVal,
+                 total_atempts: spTotalAtempts,
+                 wins: spScore.win,
+                 losses: spScore.lose,
+                 draws: spScore.draw
+              };
+           }
+        } else {
+           scores.push({
+             player_name: name,
+             score: scoreVal,
+             total_atempts: spTotalAtempts,
+             wins: spScore.win,
+             losses: spScore.lose,
+             draws: spScore.draw
+           });
+        }
+        
+        scores.sort((a,b) => b.score - a.score);
+        scores = scores.slice(0, 10);
+        localStorage.setItem('rps_single_scores', JSON.stringify(scores));
+        
+        // Reset SP Game
+        spScore = {win:0, lose:0, draw:0};
+        spTotalAtempts = 0;
+        document.getElementById('sp-player').textContent = '-';
+        document.getElementById('sp-computer').textContent = '-';
+        document.getElementById('sp-outcome').textContent = '-';
+        document.getElementById('sp-win').textContent = '0';
+        document.getElementById('sp-lose').textContent = '0';
+        document.getElementById('sp-draw').textContent = '0';
+        document.getElementById('sp-total_atempts').textContent = '0';
+        document.getElementById('sp-player-name').value = '';
+        
+        showView('view-sp-scores');
+      } else {
+        alert("No wins recorded, score cannot be saved.");
+      }
+    }
+
+    function renderSinglePlayerScores() {
+      let scores = JSON.parse(localStorage.getItem('rps_single_scores') || '[]');
+      let tbody = document.getElementById('sp-scores-tbody');
+      tbody.innerHTML = '';
+      if (scores.length === 0) {
+         tbody.innerHTML = '<tr><td colspan="7">No games have been played yet. Be the first!</td></tr>';
+         return;
+      }
+      scores.forEach((s, i) => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${s.player_name}</td><td>${s.total_atempts}</td><td>${s.score.toFixed(2)}</td><td>${s.wins}</td><td>${s.losses}</td><td>${s.draws}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+
+    // --- DOUBLE PLAYER LOGIC ---
+    let p1_choice = null, p2_choice = null, p1_ready = false, p2_ready = false, dp_total_attempts = 0, isChoiceWindowOpen = false;
+    const dpScoresObj = { p1Wins: 0, p2Wins: 0, draws: 0 };
+    const dpOutcomeElement = document.getElementById('dp-round-outcome');
+    
+    function playerReady(player) {
+        const nameInput = document.getElementById(player === 'p1' ? 'player1_name_input' : 'player2_name_input');
+        if (nameInput.value.trim() === '') {
+            alert(`Please enter a name for ${player === 'p1' ? 'Player 1' : 'Player 2'}.`);
+            return;
+        }
+
+        const readyBtn = document.getElementById(`${player}-ready-btn`);
+        if (player === 'p1') {
+            p1_ready = true;
+            readyBtn.textContent = 'Waiting for P2...';
+            readyBtn.classList.add('waiting');
+        } else {
+            p2_ready = true;
+            readyBtn.textContent = 'Waiting for P1...';
+            readyBtn.classList.add('waiting');
+        }
+        readyBtn.disabled = true;
+
+        if (p1_ready && p2_ready) startCountdown();
+    }
+
+    function startCountdown() {
+        let count = 3;
+        dpOutcomeElement.textContent = 'Get Ready!';
+        const countdownInterval = setInterval(() => {
+            if (count > 0) {
+                dpOutcomeElement.textContent = count;
+                count--;
+            } else {
+                clearInterval(countdownInterval);
+                dpOutcomeElement.textContent = 'SHOOT!';
+                enableChoiceWindow();
+            }
+        }, 1000);
+    }
+
+   function enableChoiceWindow() {
+        isChoiceWindowOpen = true;
+        document.querySelectorAll('#p1-controls .choice-btn, #p2-controls .choice-btn').forEach(btn => btn.disabled = false);
+        setTimeout(endChoiceWindow, 1500);
+    }
+
+    function makeChoice(player, choice) {
+        if (player === 'p1' && !p1_choice) {
+            p1_choice = choice;
+            highlightChoice(player, choice);
+            disablePlayerButtons(player);
+        } else if (player === 'p2' && !p2_choice) {
+            p2_choice = choice;
+            highlightChoice(player, choice);
+            disablePlayerButtons(player);
+        }
+
+        if (p1_choice && p2_choice) {
+            endChoiceWindow();
+        }
+    }
+
+    function highlightChoice(player, choice) {
+        const buttons = document.querySelectorAll(`#${player}-controls .choice-btn`);
+        buttons.forEach(btn => {
+            if (btn.textContent.toLowerCase().includes(choice)) {
+                btn.classList.add('selected');
+            }
+        });
+    }
+
+    function disablePlayerButtons(player) {
+        document.querySelectorAll(`#${player}-controls .choice-btn`).forEach(btn => btn.disabled = true);
+    }
+
+    function endChoiceWindow() {
+        if (!isChoiceWindowOpen) return;
+        isChoiceWindowOpen = false;
+        toggleChoiceButtons(true);
+        determineWinner();
+    }
+
+    function determineWinner() {
+        dp_total_attempts++;
+        const p1Name = document.getElementById('player1_name_input').value || 'Player 1';
+        const p2Name = document.getElementById('player2_name_input').value || 'Player 2';
+        
+        if (!p1_choice && !p2_choice) {
+            dpOutcomeElement.textContent = "You both missed! No points.";
+        } else if (!p1_choice) {
+            dpOutcomeElement.innerHTML = `${p1Name} didn't choose! No points awarded.`;
+        } else if (!p2_choice) {
+            dpOutcomeElement.innerHTML = `${p2Name} didn't choose! No points awarded.`;
+        } else if (p1_choice === p2_choice) {
+            dpScoresObj.draws++;
+            dpOutcomeElement.innerHTML = `It's a Draw! <br><small>You both chose ${p1_choice}</small>`;
+        } else if ((p1_choice === 'rock' && p2_choice === 'scissors') || (p1_choice === 'paper' && p2_choice === 'rock') || (p1_choice === 'scissors' && p2_choice === 'paper')) {
+            dpScoresObj.p1Wins++;
+            dpOutcomeElement.innerHTML = `${p1Name} Wins! <br><small>${p1_choice} beats ${p2_choice}</small>`;
+        } else {
+            dpScoresObj.p2Wins++;
+            dpOutcomeElement.innerHTML = `${p2Name} Wins! <br><small>${p2_choice} beats ${p1_choice}</small>`;
+        }
+        
+        updateDPScores();
+        setTimeout(resetRound, 3000);
+    }
+
+    function updateDPScores() {
+        document.getElementById('dp-p1-wins').textContent = dpScoresObj.p1Wins;
+        document.getElementById('dp-p2-wins').textContent = dpScoresObj.p2Wins;
+        document.getElementById('dp-draws').textContent = dpScoresObj.draws;
+        document.getElementById('dp-total_atempts').textContent = dp_total_attempts;
+    }
+
+    function resetRound() {
+        p1_choice = null; p2_choice = null; p1_ready = false; p2_ready = false;
+        
+        const p1ReadyBtn = document.getElementById('p1-ready-btn');
+        const p2ReadyBtn = document.getElementById('p2-ready-btn');
+        p1ReadyBtn.disabled = false;
+        p2ReadyBtn.disabled = false;
+        p1ReadyBtn.textContent = 'Ready';
+        p2ReadyBtn.textContent = 'Ready';
+        p1ReadyBtn.classList.remove('waiting');
+        p2ReadyBtn.classList.remove('waiting');
+
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+        
+        dpOutcomeElement.textContent = "Click 'Ready' or Press Enter to start!";
+    }
+
+    function toggleChoiceButtons(disabled) {
+        document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = disabled);
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (!document.getElementById('view-dp').classList.contains('active')) return;
+
+        const key = event.key.toLowerCase();
+        
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (!p1_ready && !p2_ready) {
+                document.getElementById('p1-ready-btn').click();
+                document.getElementById('p2-ready-btn').click();
+            }
+        }
+        
+        if (!isChoiceWindowOpen) return; 
+
+        if (!p1_choice && ['a', 's', 'd'].includes(key)) {
+            let choice = key === 'a' ? 'rock' : key === 's' ? 'paper' : 'scissors';
+            makeChoice('p1', choice);
+        }
+
+        if (!p2_choice && ['j', 'k', 'l'].includes(key)) {
+            let choice = key === 'j' ? 'rock' : key === 'k' ? 'paper' : 'scissors';
+            makeChoice('p2', choice);
+        }
+    });
+
+    function submitDoublePlayer() {
+      const p1Name = document.getElementById('player1_name_input').value.trim() || 'Player 1';
+      const p2Name = document.getElementById('player2_name_input').value.trim() || 'Player 2';
+      
+      if (dp_total_attempts === 0) {
+         alert("Cannot submit a game with no rounds played.");
+         return;
+      }
+      
+      let winner_name = "Draw";
+      let winner_wins = dpScoresObj.p1Wins;
+      if (dpScoresObj.p1Wins > dpScoresObj.p2Wins) {
+         winner_name = p1Name;
+      } else if (dpScoresObj.p2Wins > dpScoresObj.p1Wins) {
+         winner_name = p2Name;
+         winner_wins = dpScoresObj.p2Wins;
+      }
+      
+      let winner_score = 0;
+      let denominator = dp_total_attempts - (dpScoresObj.draws / 2);
+      if (winner_name !== "Draw" && denominator > 0) {
+          winner_score = parseInt((winner_wins / denominator) * 100);
+      }
+      
+      let sessions = JSON.parse(localStorage.getItem('rps_double_scores') || '[]');
+      sessions.push({
+         player1_name: p1Name,
+         player2_name: p2Name,
+         total_attempts: dp_total_attempts,
+         winner_name: winner_name,
+         player1_wins: dpScoresObj.p1Wins,
+         player2_wins: dpScoresObj.p2Wins,
+         winner_score: winner_score,
+         date: new Date().getTime()
+      });
+      
+      sessions.sort((a,b) => {
+         if (b.winner_score !== a.winner_score) return b.winner_score - a.winner_score;
+         return b.date - a.date;
+      });
+      sessions = sessions.slice(0, 10);
+      localStorage.setItem('rps_double_scores', JSON.stringify(sessions));
+      
+      // Reset DP
+      dpScoresObj.p1Wins = 0; dpScoresObj.p2Wins = 0; dpScoresObj.draws = 0; dp_total_attempts = 0;
+      document.getElementById('player1_name_input').value = '';
+      document.getElementById('player2_name_input').value = '';
+      updateDPScores();
+      resetRound();
+      
+      showView('view-dp-scores');
+    }
+
+    function renderDoublePlayerScores() {
+      let sessions = JSON.parse(localStorage.getItem('rps_double_scores') || '[]');
+      let tbody = document.getElementById('dp-scores-tbody');
+      tbody.innerHTML = '';
+      if (sessions.length === 0) {
+         tbody.innerHTML = '<tr><td colspan="8">No games have been played yet. Be the first!</td></tr>';
+         return;
+      }
+      sessions.forEach((s, i) => {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${s.player1_name}</td><td>${s.player2_name}</td><td>${s.total_attempts}</td><td class="winner">${s.winner_name}</td><td>${s.player1_wins}</td><td>${s.player2_wins}</td><td>${s.winner_score}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+  </script>
+</body>
+</html>
